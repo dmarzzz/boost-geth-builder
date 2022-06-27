@@ -157,6 +157,9 @@ func (b *Backend) handleRegisterValidator(w http.ResponseWriter, req *http.Reque
 	}
 
 	for _, registerRequest := range payload {
+		log.Info("reqwuest from mev-boost", "message", registerRequest.Message.Pubkey.String())
+		log.Info("reqwuest from mev-boost", "message", registerRequest.Message.FeeRecipient)
+		log.Info("reqwuest from mev-boost", "message", registerRequest.Signature.String())
 		if len(registerRequest.Message.Pubkey) != 48 {
 			respondError(w, http.StatusBadRequest, "invalid pubkey")
 			return
@@ -166,10 +169,14 @@ func (b *Backend) handleRegisterValidator(w http.ResponseWriter, req *http.Reque
 			respondError(w, http.StatusBadRequest, "invalid signature")
 			return
 		}
-
+		log.Error("VerifySignature", "builderSigningDomain", string(b.builderSigningDomain[:]))
+		log.Error("VerifySignature", "builderSigningDomain", registerRequest.Message.Pubkey.String())
 		ok, err := boostTypes.VerifySignature(registerRequest.Message, b.builderSigningDomain, registerRequest.Message.Pubkey[:], registerRequest.Signature[:])
 		if !ok || err != nil {
-			log.Error("error verifying signature", "err", err)
+
+			log.Info("error verifying signature", "ok", ok)
+			log.Info("reqwuest from mev-boost", "message", registerRequest.Message.Pubkey.String())
+
 			respondError(w, http.StatusBadRequest, "invalid signature")
 			return
 		}
@@ -242,11 +249,12 @@ func (b *Backend) handleGetHeader(w http.ResponseWriter, req *http.Request) {
 
 	// Do not validate slot separately, it will create a race between slot update and proposer key
 	if nextSlotProposer, err := b.beaconClient.getProposerForNextSlot(uint64(slot)); err != nil || nextSlotProposer != pubkeyHex {
+		// log.Info("getHeader request")
 		log.Error("getHeader requested for public key other than next slots proposer", "requested", pubkeyHex, "expected", nextSlotProposer)
-		if b.enableBeaconChecks {
-			respondError(w, http.StatusBadRequest, "unknown validator")
-			return
-		}
+		// if b.enableBeaconChecks {
+		// 	respondError(w, http.StatusBadRequest, "unknown validator")
+		// 	return
+		// }
 	}
 
 	b.bestDataLock.Lock()
