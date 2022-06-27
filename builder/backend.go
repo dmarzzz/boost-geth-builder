@@ -169,8 +169,7 @@ func (b *Backend) handleRegisterValidator(w http.ResponseWriter, req *http.Reque
 			respondError(w, http.StatusBadRequest, "invalid signature")
 			return
 		}
-		log.Error("VerifySignature", "builderSigningDomain", string(b.builderSigningDomain[:]))
-		log.Error("VerifySignature", "builderSigningDomain", registerRequest.Message.Pubkey.String())
+		log.Info("register VerifySignature", "builderSigningDomain", hexutil.Encode(b.builderSigningDomain[:]), "Pubkey", registerRequest.Message.Pubkey.String())
 		ok, err := boostTypes.VerifySignature(registerRequest.Message, b.builderSigningDomain, registerRequest.Message.Pubkey[:], registerRequest.Signature[:])
 		if !ok || err != nil {
 
