@@ -88,6 +88,7 @@ func Register(stack *node.Node, backend *eth.Ethereum, cfg *BuilderConfig) error
 	var genesisForkVersion [4]byte
 	copy(genesisForkVersion[:], genesisForkVersionBytes[:4])
 	builderSigningDomain := boostTypes.ComputeDomain(boostTypes.DomainTypeAppBuilder, genesisForkVersion, boostTypes.Root{})
+	log.Info("NewBoostService", "types.DomainTypeAppBuilder", boostTypes.DomainTypeAppBuilder, "genesisForkVersionHex", genesisForkVersion, "genesisValidatorsRootHex", boostTypes.Root{}.String())
 
 	genesisValidatorsRoot := boostTypes.Root(common.HexToHash(cfg.GenesisValidatorsRoot))
 	bellatrixForkVersionBytes, err := hexutil.Decode(cfg.BellatrixForkVersion)
