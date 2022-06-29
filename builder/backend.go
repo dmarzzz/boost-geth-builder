@@ -157,9 +157,6 @@ func (b *Backend) handleRegisterValidator(w http.ResponseWriter, req *http.Reque
 	}
 
 	for _, registerRequest := range payload {
-		log.Info("reqwuest from mev-boost", "message", registerRequest.Message.Pubkey.String())
-		log.Info("reqwuest from mev-boost", "message", registerRequest.Message.FeeRecipient)
-		log.Info("reqwuest from mev-boost", "message", registerRequest.Signature.String())
 		if len(registerRequest.Message.Pubkey) != 48 {
 			respondError(w, http.StatusBadRequest, "invalid pubkey")
 			return
@@ -221,7 +218,7 @@ func (b *Backend) handleRegisterValidator(w http.ResponseWriter, req *http.Reque
 			Timestamp:    registerRequest.Message.Timestamp,
 		}
 
-		log.Info("registered validator", "pubkey", pubkeyHex, "data", b.validators[pubkeyHex])
+		log.Info("registered validator", "call", "registerValidator", "pubkey", pubkeyHex, "data", b.validators[pubkeyHex])
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -287,6 +284,7 @@ func (b *Backend) handleGetHeader(w http.ResponseWriter, req *http.Request) {
 		respondError(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
+	log.Info("returned header", "call", "handleGetHeader", "pubkey", pubkeyHex, "blockHash", bestHeader.BlockHash, "feeRecepient", bestHeader.FeeRecipient)
 }
 
 func (b *Backend) handleGetPayload(w http.ResponseWriter, req *http.Request) {
@@ -351,6 +349,7 @@ func (b *Backend) handleGetPayload(w http.ResponseWriter, req *http.Request) {
 		respondError(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
+	log.Info("returned header", "call", "handleGetHeader", "nextSlotProposerPubkeyHex", string(nextSlotProposerPubkeyHex), "blockHash", bestHeader.BlockHash, "feeRecepient", bestHeader.FeeRecipient)
 }
 
 func (b *Backend) onForkchoice(payloadAttributes *beacon.PayloadAttributesV1) {
