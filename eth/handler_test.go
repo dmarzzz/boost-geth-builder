@@ -123,6 +123,11 @@ type testHandler struct {
 	handler *handler
 }
 
+// IsPrivateTxHash always returns false in tests
+func (p *testTxPool) IsPrivateTxHash(hash common.Hash) bool {
+	return false
+}
+
 // newTestHandler creates a new handler for testing purposes with no blocks.
 func newTestHandler() *testHandler {
 	return newTestHandlerWithBlocks(0)
